@@ -397,12 +397,14 @@ if get(g:, 'terminal_default_mapping', 1)
 		tnoremap <c-j> <c-\><c-n><c-w>j
 		tnoremap <c-k> <c-\><c-n><c-w>k
 
-		tnoremap <c-q> <c-\><c-n>
+		tnoremap <c-q> <c-\><c-n>:let g:startnormal_manual = 1<cr>
 
         let g:previous_window = -1
+        let g:startnormal_manual = 0
+
         function SmartInsert()
           if &buftype == 'terminal'
-            if g:previous_window != winnr()
+            if g:previous_window != winnr() && g:startnormal_manual == 0
               startinsert
             endif
             let g:previous_window = winnr()
@@ -410,7 +412,16 @@ if get(g:, 'terminal_default_mapping', 1)
             let g:previous_window = -1
           endif
         endfunction
-        au BufEnter * call SmartInsert()
+
+        function TerminalInsert()
+          echo "enter"
+          if &buftype == 'terminal'
+              let g:startnormal_manual = 0
+          endif
+        endfunction
+
+        autocmd BufEnter * call SmartInsert()
+        autocmd TermEnter * call TerminalInsert()
 	endif
 
 	let s:cmd = 'nnoremap <silent>'.(g:terminal_key). ' '
