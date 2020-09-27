@@ -379,81 +379,38 @@ endfunc
 
 
 "----------------------------------------------------------------------
-" enable alt key in terminal vim
-"----------------------------------------------------------------------
-if has('nvim') == 0 && has('gui_running') == 0
-	set ttimeout
-	if $TMUX != ''
-		set ttimeoutlen=35
-	elseif &ttimeoutlen > 80 || &ttimeoutlen <= 0
-		set ttimeoutlen=85
-	endif
-	function! s:meta_code(key)
-		if get(g:, 'terminal_skip_key_init', 0) == 0
-			exec "set <M-".a:key.">=\e".a:key
-		endif
-	endfunc
-	for i in range(10)
-		call s:meta_code(nr2char(char2nr('0') + i))
-	endfor
-	for i in range(26)
-		call s:meta_code(nr2char(char2nr('a') + i))
-		call s:meta_code(nr2char(char2nr('A') + i))
-	endfor
-	for c in [',', '.', '/', ';', '{', '}']
-		call s:meta_code(c)
-	endfor
-	for c in ['?', ':', '-', '_', '+', '=', "'"]
-		call s:meta_code(c)
-	endfor
-	function! s:key_escape(name, code)
-		if get(g:, 'terminal_skip_key_init', 0) == 0
-			exec "set ".a:name."=\e".a:code
-		endif
-	endfunc
-	call s:key_escape('<F1>', 'OP')
-	call s:key_escape('<F2>', 'OQ')
-	call s:key_escape('<F3>', 'OR')
-	call s:key_escape('<F4>', 'OS')
-endif
-
-
-"----------------------------------------------------------------------
 " fast window switching: ALT+SHIFT+HJKL
 "----------------------------------------------------------------------
-if get(g:, 'terminal_default_mapping', 1)
-	noremap <m-H> <c-w>h
-	noremap <m-L> <c-w>l
-	noremap <m-J> <c-w>j
-	noremap <m-K> <c-w>k
-	if mapcheck('<m-P>', 'n') == ''
-		noremap <m-P> <c-w>p
-	endif
-	inoremap <m-H> <esc><c-w>h
-	inoremap <m-L> <esc><c-w>l
-	inoremap <m-J> <esc><c-w>j
-	inoremap <m-K> <esc><c-w>k
-	if mapcheck('<m-P>', 'n') == ''
-		inoremap <m-P> <esc><c-w>p
-	endif
 
+if get(g:, 'terminal_default_mapping', 1)
 	if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
-		set termwinkey=<c-_>
-		tnoremap <m-H> <c-_>h
-		tnoremap <m-L> <c-_>l
-		tnoremap <m-J> <c-_>j
-		tnoremap <m-K> <c-_>k
-		tnoremap <m-P> <c-_>p
-		tnoremap <m-q> <c-\><c-n>
-		tnoremap <m--> <c-_>"0
+		set termwinkey=<c-w>
+		tnoremap <c-h> <c-w>h
+		tnoremap <c-l> <c-w>l
+        tnoremap <c-j> <c-w>j
+        tnoremap <c-k> <c-w>k
+
+		tnoremap <c-q> <c-\><c-n>
 	elseif has('nvim')
-		tnoremap <m-H> <c-\><c-n><c-w>h
-		tnoremap <m-L> <c-\><c-n><c-w>l
-		tnoremap <m-J> <c-\><c-n><c-w>j
-		tnoremap <m-K> <c-\><c-n><c-w>k
-		tnoremap <m-P> <c-\><c-n><c-w>p
-		tnoremap <m-q> <c-\><c-n>
-		tnoremap <m--> <c-\><c-n>"0pa
+		tnoremap <c-h> <c-\><c-n><c-w>h
+		tnoremap <c-l> <c-\><c-n><c-w>l
+		tnoremap <c-j> <c-\><c-n><c-w>j
+		tnoremap <c-k> <c-\><c-n><c-w>k
+
+		tnoremap <c-q> <c-\><c-n>
+
+        let g:previous_window = -1
+        function SmartInsert()
+          if &buftype == 'terminal'
+            if g:previous_window != winnr()
+              startinsert
+            endif
+            let g:previous_window = winnr()
+          else
+            let g:previous_window = -1
+          endif
+        endfunction
+        au BufEnter * call SmartInsert()
 	endif
 
 	let s:cmd = 'nnoremap <silent>'.(g:terminal_key). ' '
@@ -461,7 +418,7 @@ if get(g:, 'terminal_default_mapping', 1)
 
 	if has('nvim') == 0
 		let s:cmd = 'tnoremap <silent>'.(g:terminal_key). ' '
-		exec s:cmd . '<c-_>:call TerminalToggle()<cr>'
+		exec s:cmd . '<c-w>:call TerminalToggle()<cr>'
 	else
 		let s:cmd = 'tnoremap <silent>'.(g:terminal_key). ' '
 		exec s:cmd . '<c-\><c-n>:call TerminalToggle()<cr>'
@@ -526,14 +483,11 @@ command! -complete=file -nargs=1 SelectiveDrop call <SID>SelectiveDrop(<q-args>)
 "----------------------------------------------------------------------
 " new asyncrun runner: 'thelp'
 "----------------------------------------------------------------------
-function! s:runner_proc(opts)
-	let cwd = getcwd()
-	call TerminalSend('cd ' . shellescape(cwd) . "\r")
-	call TerminalSend(a:opts.cmd . "\r")
-endfunc
+" function! s:runner_proc(opts)
+" 	let cwd = getcwd()
+" 	call TerminalSend('cd ' . shellescape(cwd) . "\r")
+" 	call TerminalSend(a:opts.cmd . "\r")
+" endfunc
 
-let g:asyncrun_runner = get(g:, 'asyncrun_runner', {})
-let g:asyncrun_runner.thelp = function('s:runner_proc')
-
-
-
+" let g:asyncrun_runner = get(g:, 'asyncrun_runner', {})
+" let g:asyncrun_runner.thelp = function('s:runner_proc')
