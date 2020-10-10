@@ -108,7 +108,7 @@ endfunc
 "----------------------------------------------------------------------
 function! TerminalOpen(...)
 	let bid = get(t:, '__terminal_bid__', -1)
-	let pos = get(g:, 'terminal_pos', 'rightbelow')
+	let pos = get(g:, 'terminal_pos', 'botright')
 	let height = get(g:, 'terminal_height', 10)
 	let succeed = 0
 	function! s:terminal_view(mode)
@@ -482,7 +482,7 @@ function! s:SelectiveDrop(filename)
 		execute modifiable_wins[0] . 'wincmd w'
 		execute 'edit ' . escaped_filename
 	else
-		execute 'split ' . escaped_filename
+		execute 'split' . escaped_filename
 	endif
 endfunction
 
