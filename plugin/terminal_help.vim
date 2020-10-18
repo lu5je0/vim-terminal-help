@@ -108,7 +108,7 @@ endfunc
 "----------------------------------------------------------------------
 function! TerminalOpen(...)
 	let bid = get(t:, '__terminal_bid__', -1)
-	let pos = get(g:, 'terminal_pos', 'rightbelow')
+	let pos = get(g:, 'terminal_pos', 'botright')
 	let height = get(g:, 'terminal_height', 10)
 	let succeed = 0
 	function! s:terminal_view(mode)
@@ -397,7 +397,7 @@ if get(g:, 'terminal_default_mapping', 1)
 		tnoremap <c-j> <c-\><c-n><c-w>j
 		tnoremap <c-k> <c-\><c-n><c-w>k
 
-		tnoremap <c-q> <c-\><c-n>:let g:startnormal_manual = 1<cr>
+		tnoremap <silent> <c-q> <c-\><c-n>:let g:startnormal_manual = 1<cr>
 
         let g:previous_window = -1
         let g:startnormal_manual = 0
@@ -414,7 +414,6 @@ if get(g:, 'terminal_default_mapping', 1)
         endfunction
 
         function TerminalInsert()
-          echo "enter"
           if &buftype == 'terminal'
               let g:startnormal_manual = 0
           endif
@@ -483,7 +482,7 @@ function! s:SelectiveDrop(filename)
 		execute modifiable_wins[0] . 'wincmd w'
 		execute 'edit ' . escaped_filename
 	else
-		execute 'split ' . escaped_filename
+		execute 'split' . escaped_filename
 	endif
 endfunction
 
