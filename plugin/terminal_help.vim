@@ -299,10 +299,14 @@ function! TerminalToggle()
         let g:terminal_disable_insert = 0
 		call TerminalOpen()
 	else
+        let s:reset_cursor = 0
         let g:terminal_disable_insert = 1
+        if &buftype == 'terminal'
+            let s:reset_cursor = 1
+        endif
 		call TerminalClose()
         let windowNr = bufwinnr(g:last_window)
-        if windowNr > 0
+        if s:reset_cursor == 1 && windowNr > 0
           execute windowNr 'wincmd w'
         endif  
 	endif
