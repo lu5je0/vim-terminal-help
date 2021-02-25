@@ -47,6 +47,7 @@ let $VIM_EXE = v:progpath
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 let s:script = fnamemodify(s:home . '/../tools/utils', ':p')
 let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
+let g:last_window = -1
 
 " setup PATH for utils
 if stridx($PATH, s:script) < 0
@@ -294,8 +295,13 @@ function! TerminalToggle()
 		let alive = (bufwinnr(bid) > 0)? 1 : 0
 	endif
 	if alive == 0
+        let g:last_window = bufnr('%')
 		call TerminalOpen()
 	else
+        let windowNr = bufwinnr(g:last_window)
+        if windowNr > 0
+          execute windowNr 'wincmd w'
+        endif  
 		call TerminalClose()
 	endif
 endfunc
