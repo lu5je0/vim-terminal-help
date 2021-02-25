@@ -299,8 +299,8 @@ function! TerminalToggle()
         let g:terminal_disable_insert = 0
 		call TerminalOpen()
 	else
-		call TerminalClose()
         let g:terminal_disable_insert = 1
+		call TerminalClose()
         let windowNr = bufwinnr(g:last_window)
         if windowNr > 0
           execute windowNr 'wincmd w'
@@ -413,7 +413,7 @@ if get(g:, 'terminal_default_mapping', 1)
         function SmartInsert()
           if &buftype == 'terminal'
             if g:previous_window != winnr() && g:startnormal_manual == 0 && g:terminal_disable_insert == 0
-              startinsert
+                startinsert
             endif
             let g:previous_window = winnr()
           else
