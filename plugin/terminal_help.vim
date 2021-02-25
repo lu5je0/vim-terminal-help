@@ -298,11 +298,11 @@ function! TerminalToggle()
         let g:last_window = bufnr('%')
 		call TerminalOpen()
 	else
+		call TerminalClose()
         let windowNr = bufwinnr(g:last_window)
         if windowNr > 0
           execute windowNr 'wincmd w'
         endif  
-		call TerminalClose()
 	endif
 endfunc
 
