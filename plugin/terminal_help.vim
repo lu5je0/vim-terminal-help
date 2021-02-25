@@ -48,6 +48,7 @@ let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 let s:script = fnamemodify(s:home . '/../tools/utils', ':p')
 let s:windows = has('win32') || has('win64') || has('win95') || has('win16')
 let g:last_window = -1
+let g:terminal_disable_insert = 1
 
 " setup PATH for utils
 if stridx($PATH, s:script) < 0
@@ -431,8 +432,11 @@ if get(g:, 'terminal_default_mapping', 1)
           endif
         endfunction
 
-        autocmd BufEnter * call SmartInsert()
-        autocmd TermEnter * call TerminalInsert()
+        augroup terminal_insert_group
+            autocmd!
+            autocmd BufEnter * call SmartInsert()
+            autocmd TermEnter * call TerminalInsert()
+        augroup END
 	endif
 
 	let s:cmd = 'nnoremap <silent>'.(g:terminal_key). ' '
